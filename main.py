@@ -118,6 +118,8 @@ def connection_portal(command, command_split):
                         break
                 return
 
+            else:
+                error(ErrorCode.ConnectionFailed)
         case 3:
             try: HOST = socket.gethostbyname(str(command_split[1]))
             except socket.gaierror: 
