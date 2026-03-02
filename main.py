@@ -5,12 +5,16 @@ import os
 import shutil
 import asyncio
 import pprint
+import socket
+import json
 
 from bleak import BleakScanner
 import subprocess, webbrowser
 from collections import deque
 from pathlib import Path
-import socket, json
+
+#error codes in the ErrorCodes.py
+from ErrorCodes import ErrorCode
 
 #ANSI colors
 GREEN = '\033[92m'
@@ -24,6 +28,8 @@ history = deque(maxlen=35)
 
 #Error handler
 def error(message):
+    if isinstance(message, ErrorCode):
+        message = message.value
     print(f"{WARNING}{message}{RESET}")
     return
 
@@ -41,16 +47,16 @@ async def ble_discover(command, command_split):
 
         except asyncio.CancelledError: raise   
         except KeyboardInterrupt: 
-            print(f"{WARNING}KeyboardInterrupt{RESET}")
+            error(ErrorCode.KBInterrupt)
             return
-    else: error("Unable To Discover devices")
+    else: error(ErrorCode.DiscoverError)
     return
 
 #adapter for the bleak scanner
 def bleak_adapter(command, command_split):
     try: asyncio.run(ble_discover(command, command_split))
     except Exception:
-        print(f"{WARNING}Unable To Run Scan{RESET} >> Returning")
+        error(ErrorCode.DiscoverError)
     return
 
 #directory access
@@ -69,7 +75,7 @@ def socketErrno_reader():
 #port valid range
 def valid_range(PORT: int) -> bool:
     maximum_port = 65535
-    return 0 <= PORT <= maximum_port
+    return 1 <= PORT <= maximum_port
 
 #initialize sockets
 def socket_initialize(HOST, PORT):
@@ -102,25 +108,25 @@ def connection_portal(command, command_split):
                     PORT = int(port_iterator)
 
                     if not valid_range(PORT):
-                        error("Port Not In Range >> (Invalid port)")
+                        error(ErrorCode.PortNotInRange)
                         return
 
                     status = socket_initialize(HOST, PORT)
                     try: scan_initialize(PORT, status)  
                     except KeyError: 
-                        error("KeyError >> Unable To Form Connection")
+                        error(ErrorCode.ConnectionFailed)
                         break
                 return
 
         case 3:
             try: HOST = socket.gethostbyname(str(command_split[1]))
             except socket.gaierror: 
-                error("socket.gaierror >> Unable To Find Hostname")
+                error(ErrorCode.HostnameNotFound)
                 return
             
             PORT = int(command_split[2])
             if not valid_range(PORT):
-                error("Port Not In Range >> (Invalid port)")
+                error(ErrorCode.PortNotInRange)
                 return
             
             print(f"{GREEN}Connnecting To {HOST} From {PORT}{RESET}")
@@ -135,12 +141,12 @@ def connection_portal(command, command_split):
 #executing file
 def execute_file(command, command_split):
     if len(command_split) < 2:
-        error("Invalid Arguments")
+        error(ErrorCode.InvalidArguments)
         return
     
     execute_path = shutil.which(command_split[1])
     if execute_path is None:
-        error("File Not Found in PATH")
+        error(ErrorCode.FileNotFound)
         return
     
     if os.access(str(execute_path), os.X_OK):
@@ -150,7 +156,7 @@ def execute_file(command, command_split):
         return
     
     else: 
-        error("Unable To Execute File")
+        error(ErrorCode.UnableToExecuteFile)
         return
 
 #website opener
@@ -162,7 +168,7 @@ def open_website(command, command_split):
         webbrowser.open(url)
         return
     else: 
-        error("Website Not Found")
+        error(ErrorCode.WebsiteNotFound)
         return
     
 #environment variables   
@@ -172,7 +178,7 @@ def environ_print(command, command_split):
         pprint.pprint(dict(envar), width=5, indent=5) 
         return
     else: 
-        error("Invalid Arguments")
+        error(ErrorCode.InvalidArguments)
         return
 
 #check file
@@ -195,10 +201,10 @@ def type_command(command, command_split):
                 return 
 
             else: 
-                error("Command Not Found")
+                error(ErrorCode.CommandNotFound)
                 return
         case _: 
-            error("Invalid Arguments")
+            error(ErrorCode.InvalidArguments)
             return
 
 #change current working directory
@@ -213,11 +219,11 @@ def change_directory(command, command_split):
             return
 
         if not os.path.exists(directory):
-            error("Path Not Found")
+            error(ErrorCode.PathNotFound)
             return
 
         if not os.path.isdir(directory):
-            error("Directory Not Found")
+            error(ErrorCode.DirectoryNotFound)
             return
 
         try: 
@@ -225,29 +231,30 @@ def change_directory(command, command_split):
             return
 
         except FileNotFoundError: 
-            print("FileNotFoundError")
+            error(ErrorCode.FileNotFound)
             return
     else: 
-        error("Command Not Found")
+        error(ErrorCode.FileNotFound)
         return
+
+#list of tools
+tools = {
+    "git",
+    "curl"
+}
 
 #external tool wrappers 
 def external_tools(command, command_split):
-    tools = {
-        "git",
-        "curl"
-    }
-
     if command_split[0] in tools:
         try: 
             subprocess.run(command_split, shell=False, check=True)
             return
         
         except subprocess.CalledProcessError: 
-            error("subprocess.CalledProcessError")
+            error(ErrorCode.SubprocessError)
             return
     else:
-        error("Invalid Command")
+        error(ErrorCode.CommandNotFound)
         return
 
 #access history deque
@@ -258,15 +265,16 @@ def modify_history(command, command_split):
             print(f">> {element}")
         return     
     if len(command_split) == 2:
+
         match command_split[1]:
             case 'clear':
                 history.clear()
                 return
             case _: 
-                error("Command Not Found")
+                error(ErrorCode.InvalidArguments)
                 return
     else: 
-        error("Invalid Command Lenght")
+        error(ErrorCode.InvalidArguments)
         return
             
 #all usable commands
@@ -299,12 +307,12 @@ def command_execute(current_directory):
         try: command_split = shlex.split(command) 
 
         except ValueError: 
-            error("ValueError")
+            error(ErrorCode.ValueErrorInput)
             return
         
         for element in range(len(command_split)):
             if len(command_split[element]) >= MAX_TOKEN_LENGTH:
-                error("MAX_TOKEN_LENGTH >> exceeded")
+                error(ErrorCode.MaxTokenExceeded)
                 return
     
         if command_split[0] in commands:
@@ -312,11 +320,11 @@ def command_execute(current_directory):
             execute(command, command_split)
         
         else: 
-            error("Command Not Found")
+            error(ErrorCode.CommandNotFound)
             return
 
     except KeyboardInterrupt: 
-        error("KeyboardInterrupt")
+        error(ErrorCode.KBInterrupt)
         return
     
 def main():
