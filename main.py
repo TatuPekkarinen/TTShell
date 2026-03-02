@@ -16,13 +16,13 @@ from pathlib import Path
 
 
 #error codes in the ErrorCodes.py
-from errorCodes import ErrorCode
+from errorClass import ErrorCode
 
 #command list from commands.py
-from cmdList import commands
+from commandExec import commands
 
 #external tool dictionary
-from toolsList import tools
+from toolBox import tools
 
 #ANSI colors
 GREEN = '\033[92m'
