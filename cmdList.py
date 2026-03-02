@@ -1,3 +1,6 @@
+from pprint import pprint
+import sys 
+
 commands = {
     "exit": lambda command, command_split: sys.exit(0),
     "python": lambda command, command_split: print(sys.version),

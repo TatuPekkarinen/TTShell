@@ -1,5 +1,6 @@
 import shlex
-import time, datetime
+import time
+import datetime
 import sys
 import os 
 import shutil
@@ -13,8 +14,15 @@ import subprocess, webbrowser
 from collections import deque
 from pathlib import Path
 
+
 #error codes in the ErrorCodes.py
 from errorCodes import ErrorCode
+
+#command list from commands.py
+from cmdList import commands
+
+#external tool dictionary
+from toolsList import tools
 
 #ANSI colors
 GREEN = '\033[92m'
@@ -239,12 +247,6 @@ def change_directory(command, command_split):
         error(ErrorCode.FileNotFound)
         return
 
-#list of tools
-tools = {
-    "git",
-    "curl"
-}
-
 #external tool wrappers 
 def external_tools(command, command_split):
     if command_split[0] in tools:
@@ -278,24 +280,6 @@ def modify_history(command, command_split):
     else: 
         error(ErrorCode.InvalidArguments)
         return
-            
-#all usable commands
-commands = {
-    "exit": lambda command, command_split: sys.exit(0),
-    "python": lambda command, command_split: print(sys.version),
-    "echo": lambda command, command_split: print(*command_split[1:]),
-    "com": lambda command, command_split: pprint.pprint(dict(commands), width = 5),
-    "ble": bleak_adapter,
-    "git": external_tools,
-    "curl": external_tools,
-    "type": type_command,
-    "web": open_website,
-    "env": environ_print,
-    "file": execute_file,
-    "change": change_directory,
-    "con": connection_portal,
-    "history": modify_history
-}
 
 #executing commands
 def command_execute(current_directory):
