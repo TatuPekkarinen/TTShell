@@ -90,8 +90,7 @@ def socket_initialize(HOST, PORT):
         return status
 
 #scan results
-def scan_initialize(PORT, status):
-    sock_data = socketErrno_reader()
+def scan_initialize(PORT, status, sock_data):
     if status == 0:
         print(f"Port >> {PORT} >> {GREEN}{sock_data[str(status)]}{RESET}")
     if status > 0: 
@@ -100,9 +99,10 @@ def scan_initialize(PORT, status):
 
 #connectivity tester and port scanner   
 def connection_portal(command, command_split):
+    sock_data = socketErrno_reader()
     match len(command_split):
         case 4:
-            if command_split[1] == 'locrange':
+            if command_split[1] == 'range':
                 print(f"{GREEN}Starting Scan From {command_split[2]} To {command_split[3]}{RESET}")
                 scanrange_min = int(command_split[2])
                 scanrange_max = int(command_split[3]) + 1
@@ -117,7 +117,7 @@ def connection_portal(command, command_split):
                         return
 
                     status = socket_initialize(HOST, PORT)
-                    try: scan_initialize(PORT, status)  
+                    try: scan_initialize(PORT, status, sock_data)  
                     except KeyError: 
                         error(ErrorCode.ConnectionFailed)
                         break
@@ -137,7 +137,7 @@ def connection_portal(command, command_split):
             
             print(f"{GREEN}Connnecting To {HOST} From {PORT}{RESET}")
             status = socket_initialize(HOST, PORT)
-            scan_initialize(PORT, status)  
+            scan_initialize(PORT, status, sock_data)  
             return
             
         case _:
