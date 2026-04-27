@@ -1,3 +1,12 @@
+#external libraries
+from bleak import BleakScanner
+from collections import deque
+from pathlib import Path
+
+#local folder
+from errorclass import ErrorCode
+from toolbox import tools
+
 import shlex
 import time
 import datetime
@@ -10,16 +19,6 @@ import socket
 import json
 import subprocess
 import webbrowser
-
-from bleak import BleakScanner
-from collections import deque
-from pathlib import Path
-
-#error codes in the errorclass.py
-from errorclass import ErrorCode
-
-#external tool dictionary
-from toolbox import tools
 
 #ANSI colors
 GREEN = '\033[92m'
@@ -103,10 +102,8 @@ def connection_portal(command, command_split):
     match len(command_split):
         case 4:
             if command_split[1] == 'range':
-                print(f"{GREEN}Starting Scan From {command_split[2]} To {command_split[3]}{RESET}")
-                scanrange_min = int(command_split[2])
-                scanrange_max = int(command_split[3]) + 1
-
+                print(f"{GREEN}SCAN from {command_split[2]} To {command_split[3]}{RESET}")
+                scanrange_min, scanrange_max = int(command_split[2]), int(command_split[3]) + 1
                 for port_iterator in range(scanrange_min, scanrange_max):
                     #this address shouldn't be changed
                     HOST = '127.0.0.1' 
@@ -122,7 +119,9 @@ def connection_portal(command, command_split):
                         error(ErrorCode.ConnectionFailed)
                         break
                 return
-            else: error(ErrorCode.ConnectionFailed)
+            else: 
+                error(ErrorCode.ConnectionFailed)
+                return
 
         case 3:
             try: HOST = socket.gethostbyname(str(command_split[1]))
@@ -157,7 +156,6 @@ def execute_file(command, command_split):
     
     if os.access(str(execute_path), os.X_OK):
         print(f"{GREEN}Opening File{RESET} >> ({execute_path})")
-        time.sleep(1)
         subprocess.run(execute_path, check=True, shell=False)
         return
     
@@ -301,7 +299,8 @@ def command_execute(current_directory):
 
     try:
         command = input()
-        if command == '': return
+        if command == '': 
+            return
         history.append(command)
         try: command_split = shlex.split(command) 
 
