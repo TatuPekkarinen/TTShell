@@ -63,15 +63,6 @@ Port / 2 / CONNECTION REFUSED
 
 ```
 
-### Bluetooth device discovery
-*discovers nearby Bluetooth addresses*
-```
-[/path/to/tt-shell-python/main.py] >>> ble
-{Bluetooth devices}
->>> KeyboardInterrupt
-{ends discovering}
-```
-
 
 ### Type Command
 *Checks if a command is builtin or a system executable*
