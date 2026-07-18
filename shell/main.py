@@ -60,10 +60,11 @@ def socket_initialize(HOST, PORT):
 
 #scan results
 def scan_initialize(PORT, status, sock_data):
+    msg = sock_data.get(str(status), "UNKNOWN ERROR")
     if status == 0:
-        print(f"Port >> {PORT} >> {acolor.GREEN}{sock_data[str(status)]}{acolor.RESET}")
+        print(f"Port >> {PORT} >> {acolor.GREEN}{msg}{acolor.RESET}")
     if status > 0: 
-        print(f"Port >> {PORT} >> {acolor.RED}{sock_data[str(status)]}{acolor.RESET}")
+        print(f"Port >> {PORT} >> {acolor.RED}{msg}{acolor.RESET}")
     return
 
 #connectivity tester and port scanner   
@@ -73,21 +74,22 @@ def connection_portal(command, command_split):
         case 4:
             if command_split[1] == 'range':
                 print(f"{acolor.GREEN}SCAN from {command_split[2]} To {command_split[3]}{acolor.RESET}")
-                scanrange_min = int(command_split[2])
-                scanrange_max = int(command_split[3]) + 1
+
+                try:
+                    scanrange_min = int(command_split[2])
+                    scanrange_max = int(command_split[3]) + 1
+                except ValueError:
+                    error(ErrorCode.InvalidArguments)
+                    return
+                
                 for port_iterator in range(scanrange_min, scanrange_max):
                     HOST = '127.0.0.1' 
-                    PORT = int(port_iterator)
-
+                    PORT = port_iterator
                     if not valid_range(PORT):
                         error(ErrorCode.PortNotInRange)
                         return
-                    
                     status = socket_initialize(HOST, PORT)
-                    try: scan_initialize(PORT, status, sock_data)  
-                    except KeyError: 
-                        error(ErrorCode.ConnectionFailed)
-                        break
+                    scan_initialize(PORT, status, sock_data)  
                 return
             else: 
                 error(ErrorCode.ConnectionFailed)
@@ -99,8 +101,13 @@ def connection_portal(command, command_split):
             except socket.gaierror: 
                 error(ErrorCode.HostnameNotFound)
                 return
-        
-            PORT = int(command_split[2])
+            
+            try:
+                PORT = int(command_split[2])
+            except ValueError:
+                error(ErrorCode.InvalidArguments)
+                return
+            
             if not valid_range(PORT):
                 error(ErrorCode.PortNotInRange)
                 return
@@ -184,35 +191,32 @@ def type_command(command, command_split):
             error(ErrorCode.InvalidArguments)
             return
 
-#change current working directory
+#change directory
 def change_directory(command, command_split):
-    script_directory = shell_directory()
-
-    if len(command_split) > 1:
-        directory = str(command_split[1])
-
-        if command_split[1] == 'reset':
-            os.chdir(script_directory)
-            return
-        
-        if not os.path.exists(directory):
-            error(ErrorCode.PathNotFound)
-            return
-        
-        if not os.path.isdir(directory):
-            error(ErrorCode.DirectoryNotFound)
-            return
-
-        try: 
-            os.chdir(str(directory))
-            return
-        
-        except FileNotFoundError: 
-            error(ErrorCode.FileNotFound)
-            return
-    else: 
-        error(ErrorCode.FileNotFound)
+    if len(command_split) < 2:
+        error(ErrorCode.InvalidArguments)
         return
+
+    directory = command_split[1]
+    if directory == "reset":
+        try:
+            os.chdir(shell_directory())
+        except PermissionError:
+            error(ErrorCode.PathNotFound)
+        return
+
+    if not os.path.exists(directory):
+        error(ErrorCode.PathNotFound)
+        return
+
+    if not os.path.isdir(directory):
+        error(ErrorCode.DirectoryNotFound)
+        return
+
+    try:
+        os.chdir(directory)
+    except PermissionError:
+        error(ErrorCode.PathNotFound)
 
 #external tool wrappers 
 def external_tools(command, command_split):
@@ -265,13 +269,14 @@ commands = {
 }
 
 #executing commands
-def command_execute(current_directory):
+def command_execute():
     try:
         max_token = 63
-        command = input()
-        if command == '': return
+        try: command = input()
+        except EOFError: sys.exit(0)
+        if not command.strip(): return
         try: command_split = shlex.split(command) 
-
+        
         except ValueError: 
             error(ErrorCode.ValueErrorInput)
             return
@@ -313,7 +318,7 @@ def main():
     while True:
         current_directory = os.getcwd()
         sys.stdout.write(f"[{current_directory}]{acolor.GREEN} >> {acolor.RESET}")
-        command_execute(current_directory)
+        command_execute()
 
 if __name__ == "__main__":
     main()
