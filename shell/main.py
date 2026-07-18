@@ -1,4 +1,3 @@
-# Standard library
 import os
 import sys
 import json
@@ -13,11 +12,11 @@ import webbrowser
 from collections import deque
 from pathlib import Path
 
-# Local
+#local
 from errorclass import ErrorCode
 from toolbox import tools
 
-class ansi_color:
+class acolor:
     GREEN = '\033[92m'
     BLUE = '\033[94m'
     PURPLE = '\033[95m'
@@ -31,7 +30,7 @@ history = deque(maxlen=35)
 def error(message):
     if isinstance(message, ErrorCode):
         message = message.value
-    print(f"{ansi_color.RED}{message}{ansi_color.RESET}")
+    print(f"{acolor.RED}{message}{acolor.RESET}")
     return
 
 #directory access
@@ -62,9 +61,9 @@ def socket_initialize(HOST, PORT):
 #scan results
 def scan_initialize(PORT, status, sock_data):
     if status == 0:
-        print(f"Port >> {PORT} >> {ansi_color.GREEN}{sock_data[str(status)]}{ansi_color.RESET}")
+        print(f"Port >> {PORT} >> {acolor.GREEN}{sock_data[str(status)]}{acolor.RESET}")
     if status > 0: 
-        print(f"Port >> {PORT} >> {ansi_color.RED}{sock_data[str(status)]}{ansi_color.RESET}")
+        print(f"Port >> {PORT} >> {acolor.RED}{sock_data[str(status)]}{acolor.RESET}")
     return
 
 #connectivity tester and port scanner   
@@ -73,7 +72,7 @@ def connection_portal(command, command_split):
     match len(command_split):
         case 4:
             if command_split[1] == 'range':
-                print(f"{ansi_color.GREEN}SCAN from {command_split[2]} To {command_split[3]}{ansi_color.RESET}")
+                print(f"{acolor.GREEN}SCAN from {command_split[2]} To {command_split[3]}{acolor.RESET}")
                 scanrange_min = int(command_split[2])
                 scanrange_max = int(command_split[3]) + 1
                 for port_iterator in range(scanrange_min, scanrange_max):
@@ -106,7 +105,7 @@ def connection_portal(command, command_split):
                 error(ErrorCode.PortNotInRange)
                 return
             
-            print(f"{ansi_color.GREEN}Connnecting To {HOST} From {PORT}{ansi_color.RESET}")
+            print(f"{acolor.GREEN}Connnecting To {HOST} From {PORT}{acolor.RESET}")
             status = socket_initialize(HOST, PORT)
             scan_initialize(PORT, status, sock_data)  
             return
@@ -127,7 +126,7 @@ def execute_file(command, command_split):
         return
     
     if os.access(str(execute_path), os.X_OK):
-        print(f"{ansi_color.GREEN}Opening File{ansi_color.RESET} >> ({execute_path})")
+        print(f"{acolor.GREEN}Opening File{acolor.RESET} >> ({execute_path})")
         try:
             subprocess.run(execute_path, check=True, shell=False)
             return
@@ -232,7 +231,7 @@ def external_tools(command, command_split):
 #access history deque
 def modify_history(command, command_split):  
     if len(command_split) == 1:
-        print(f"{ansi_color.GREEN} >> Command History{ansi_color.RESET}")
+        print(f"{acolor.GREEN} >> Command History{acolor.RESET}")
         for element in history:
             print(f">> {element}")
         return     
@@ -299,21 +298,21 @@ def command_execute(current_directory):
     
 def main():
     try:
-        print(f">> {ansi_color.GREEN}Connecting{ansi_color.RESET} / <Turn Firewall Off>")
+        print(f">> {acolor.GREEN}Connecting{acolor.RESET} / <Turn Firewall Off>")
         HOST, PORT = '1.1.1.1', 443
         with socket.create_connection((HOST, PORT), timeout = 1.0): 
-            print(f"Initial Network Status >> {ansi_color.GREEN}Online{ansi_color.RESET}")
+            print(f"Initial Network Status >> {acolor.GREEN}Online{acolor.RESET}")
     
     except OSError:
-        print(f"Initial Network Status >> {ansi_color.RED}Offline{ansi_color.RESET}")
+        print(f"Initial Network Status >> {acolor.RED}Offline{acolor.RESET}")
 
     except KeyboardInterrupt: sys.exit(0)
 
     date = datetime.datetime.now()
-    print(f"{ansi_color.PURPLE}tt-shell [{sys.argv[0]}]{ansi_color.RESET} / {ansi_color.BLUE}{date}{ansi_color.RESET}")
+    print(f"{acolor.PURPLE}tt-shell [{sys.argv[0]}]{acolor.RESET} / {acolor.BLUE}{date}{acolor.RESET}")
     while True:
         current_directory = os.getcwd()
-        sys.stdout.write(f"[{current_directory}]{ansi_color.GREEN} >> {ansi_color.RESET}")
+        sys.stdout.write(f"[{current_directory}]{acolor.GREEN} >> {acolor.RESET}")
         command_execute(current_directory)
 
 if __name__ == "__main__":
