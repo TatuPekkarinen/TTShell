@@ -3,12 +3,9 @@
 ### Developed in Python version 3.14.2 ###
 #### Requires Python 3.10+ and Linux for full functionality ####
 
-Monolithically structured Python shell with various functionalities. Using OS-level libraries and subprocesses along with other interesting libraries. Parses with Shlex and the shell provides the possibility to use Git and Curl through subprocess wrappers. Usable for actual purposes, open source tinkering or whatever. My largest scale software project so far, tt-shell has taught me a lot about maintainability, the weight of decisions and technical debt. 
+Monolithically structured Python shell with various functionalities. Using OS-level libraries and subprocesses along with other interesting libraries. Parses with Shlex and the shell provides the possibility to use Git and Curl through subprocess wrappers. Usable for actual purposes, open source tinkering or whatever. 
 
-### Security caution
-Not intended for any security critical usages. Not yet hardened for production and only for educational purposes.
-
-## tt-shell
+## TTShell
 
 ### Setup guide
 *requires Curl and Git installed*
