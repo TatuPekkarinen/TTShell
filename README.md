@@ -1,19 +1,19 @@
-### Minimal Python Shell ###
+### TT-PyShell ###
 
 ### Developed in Python version 3.14.2 ###
-#### Requires Python 3.10+ and Linux for full functionality ####
+#### Requires Python 3.10+, cURL, Git and Linux for full functionality ####
 
-Monolithically structured Python shell with various functionalities. Using OS-level libraries and subprocesses along with other interesting libraries. Parses with Shlex and the shell provides the possibility to use Git and Curl through subprocess wrappers. Usable for actual purposes, open source tinkering or whatever. 
+A Python shell with a few useful features built around OS libraries, subprocesses, and other Python libraries. It uses `shlex` for parsing and includes wrappers for tools like Git and cURL. Mostly built as a learning project, but it's also usable for actual command-line work and easy to mess around with if you want to add your own features.
+
 
 ## TTShell
 
 ### Setup guide
-*requires Curl and Git installed*
 
 *Clone this repo*
 
 ```
-git clone https://github.com/TatuPekkarinen/tt-shell.git
+git clone https://github.com/TatuPekkarinen/c
 
 ```
 
@@ -27,7 +27,7 @@ pip install -r requirements.txt
 *Then just run the script main.py*
 ```
 For the working directory of the shell
-[/-/-/shell/tt-shell-python] 
+[/-/-/shell/TT-PyShell] 
 python main.py
 
 ```
