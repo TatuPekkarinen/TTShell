@@ -6,8 +6,6 @@
 A Python shell with a few useful features built around OS libraries, subprocesses, and other Python libraries. It uses `shlex` for parsing and includes wrappers for tools like Git and cURL. Mostly built as a learning project, but it's also usable for actual command-line work and easy to mess around with if you want to add your own features.
 
 
-## TTShell
-
 ### Setup guide
 
 *Clone this repo*
