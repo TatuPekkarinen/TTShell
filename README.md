@@ -1,6 +1,6 @@
 # mini-pyshell
 
-A small interactive shell written in Python. Uses shlex for parsing and subprocess for execution. 
+A small interactive shell written in Python. Uses shlex for parsing and subprocess for execution. Commands in one monolith. 
 Built to learn how the standard library and socket connections work, and usable as a real shell along the way.
 
 ## Requirements
