@@ -1,194 +1,151 @@
-### TT-PyShell ###
+# mini-pyshell
 
-### Developed in Python version 3.14.2 ###
-#### Requires Python 3.10+, cURL, Git and Linux for full functionality ####
+A small interactive shell written in Python. Uses shlex for parsing and subprocess for execution. 
+Built to learn how the standard library and socket connections work, and usable as a real shell along the way. Also a challenge
 
-A Python shell with a few useful features built around OS libraries, subprocesses, and other Python libraries. It uses `shlex` for parsing and includes wrappers for tools like Git and cURL. Mostly built as a learning project, but it's also usable for actual command-line work and easy to mess around with if you want to add your own features.
+## Requirements
 
+- Python 3.10+ (developed on 3.14.2)
+- Linux
+- `git`, `curl`
 
-### Setup guide
-
-*Clone this repo*
-
-```
-git clone https://github.com/TatuPekkarinen/c
+## Install
 
 ```
-
-*Pip install requirements.txt*
-
-```
+git clone https://github.com/TatuPekkarinen/mini-pyshell
+cd mini-pyshell
 pip install -r requirements.txt
-
-```
-
-*Then just run the script main.py*
-```
-For the working directory of the shell
-[/-/-/shell/TT-PyShell] 
 python main.py
-
 ```
 
+## Commands
 
+| Command | Description |
+| --- | --- |
+| `con <host> <port>` | Test a single TCP port |
+| `con range <start> <end>` | Scan a localhost port range |
+| `type <command>` | Show whether a command is builtin or a system executable |
+| `echo <text>` | Print text |
+| `web <url>` | Check connectivity, then open the site |
+| `file <path>` | Run a system file |
+| `change <path>` | Change working directory (`change reset` to return) |
+| `history` | Show past commands (`history clear` to wipe) |
+| `git <args>` | Git wrapper |
+| `curl <args>` | cURL wrapper |
+| `com` | List available commands |
+| `env` | List environment variables |
+| `python` | Show the running Python version |
+| `exit` | Quit |
 
-### Initial interface
+## Startup
+
 ```
-tt-shell / <timestamp>
+mini-pyshell / <timestamp>
 Network Status >> <status>
-[/path/to/tt-shell-python/main.py] >>> 
-
+[~/mini-pyshell] >>>
 ```
 
+## Examples
 
+### Connections
 
-### Connection Commands
-*Single Port Connection*
 ```
-[/path/to/tt-shell-python/main.py] >>> con <host> <port>
+[~/mini-pyshell] >>> con <host> <port>
 connecting to <host_ip> from <port>
 Port / <port> / RESPONDED
-```
-*Ranged Localhost Port Scan*
-```
-[/path/to/tt-shell-python/main.py] >>> con range <start_port> <end_port>
-Starting scan from <start_port> to <end_port>
+
+[~/mini-pyshell] >>> con range 1 2
+Starting scan from 1 to 2
 Port / 1 / CONNECTION REFUSED
 Port / 2 / CONNECTION REFUSED
-
 ```
 
-
-### Type Command
-*Checks if a command is builtin or a system executable*
-```
-[/path/to/tt-shell-python/main.py] >>> type <command>
-<command> >>> <path or function info>
+### Type
 
 ```
-
-```
-[/path/to/tt-shell-python/main.py] >>> type echo
+[~/mini-pyshell] >>> type echo
 echo // <function reference>
 
-[/path/to/tt-shell-python/main.py] >>> type konsole
+[~/mini-pyshell] >>> type konsole
 konsole >>> /usr/bin/konsole
 ```
 
+### Echo
 
-
-### Echo Command
-*Prints text to the shell*
 ```
-[/path/to/tt-shell-python/main.py] >>> echo "Hello world!"
+[~/mini-pyshell] >>> echo "Hello world!"
 Hello world!
 ```
 
+### Web
 
-
-### Web Command
-*Opens a website and checks connectivity*
 ```
-[/path/to/tt-shell-python/main.py] >>> web <website>
+[~/mini-pyshell] >>> web <website>
 CONNECTION TEST >>> Connection to <host_ip> from <443>
 CONNECTION SUCCESSFUL >>> Accessing website / <website>
 ```
 
+### File
 
-
-### File Execution
-*Runs a system file*
 ```
-[/path/to/tt-shell-python/main.py] >>> file <filename>
+[~/mini-pyshell] >>> file <filename>
 Opening file >>> <path_to_file>
 ```
 
-
-
 ### Change directory
-*changes current working directory*
+
 ```
-[/home/--/shell/tt-shell-python] >>> change /home
+[~/mini-pyshell] >>> change /home
 [/home] >>> change reset
-[/home/--/shell/tt-shell-python] >>>
+[~/mini-pyshell] >>>
 ```
 
+### History
 
-
-### Command History
-*View and clear past commands*
 ```
-[/path/to/tt-shell-python/main.py] >>> history
+[~/mini-pyshell] >>> history
 Command history
 >>> <past commands>
+
+[~/mini-pyshell] >>> history clear
 ```
 
-```
-[/path/to/tt-shell-python/main.py] >>> history clear
-```
-
-
-
-### Git Commands
-*Supports Git commands via wrapper*
+### Git
 
 ```
-[/path/to/tt-shell-python/main.py] >>> git
+[~/mini-pyshell] >>> git
 usage: git <command> [<args>]
 Common Git commands:
   clone, init, add, mv, restore, rm, bisect, diff, grep, log, show, status,
   backfill, branch, commit, merge, rebase, reset, switch, tag, fetch, pull, push
 ```
 
+### cURL
 
-
-### cURL Wrapper
-*Supports curl commands*
 ```
-[/path/to/tt-shell-python/main.py] >>> curl <url>
-### Example:
-[/path/to/tt-shell-python/main.py] >>> curl google.com
+[~/mini-pyshell] >>> curl google.com
 <HTML>...
 <TITLE>301 Moved</TITLE>
 ...
 ```
 
+### Misc
 
+```
+[~/mini-pyshell] >>> com
+{'com': <function>, 'con': <function>, 'curl': <function>, 'echo': <function>,
+ 'env': <function>, 'exit': <function>, 'file': <function>, 'git': <function>,
+ 'history': <function>, 'morph': <function>, 'python': <function>,
+ 'type': <function>, 'web': <function>}
 
-### Debugging Commands
-*Lists all available commands*
+[~/mini-pyshell] >>> env
+{'HOME': '<user_home>', 'PATH': '<env_paths>', 'SHELL': '/usr/bin/bash',
+ 'USER': '<username>', 'VIRTUAL_ENV': '<venv_path>', ...}
+
+[~/mini-pyshell] >>> python
+3.14.2
 ```
-[/path/to/tt-shell-python/main.py] >>> com
-{
- 'com': <function>,
- 'con': <function>,
- 'curl': <function>,
- 'echo': <function>,
- 'env': <function>,
- 'exit': <function>,
- 'file': <function>,
- 'git': <function>,
- 'history': <function>,
- 'morph': <function>,
- 'python': <function>,
- 'type': <function>,
- 'web': <function>
-}
-```
-*Displays environment variables*
-```
-[/path/to/tt-shell-python/main.py] >>> env
-{
- 'HOME': '<user_home>',
- 'PATH': '<env_paths>',
- 'SHELL': '/usr/bin/bash',
- 'USER': '<username>',
- 'VIRTUAL_ENV': '<venv_path>',
- ...
-}
-```
-*Displays current python version*
-```
-[/path/to/tt-shell-python/main.py] >>> python
-[/path/to/tt-shell-python/main.py] >>> {python version}
-```
+
+## License
+
+MIT
